@@ -86,6 +86,27 @@ local m_LevelPartitionList = {
 	SP_Villa = Guid("6B420080-18CB-11E0-B456-BF5782883243")
 }
 
+SubWorldBundleLoadingList = {
+	COOP_002 = {},
+	COOP_003 = {},
+	COOP_006 = {},
+	COOP_007 = {},
+	COOP_009 = {},
+	COOP_010 = {},
+	SP_Bank = {},
+	SP_Earthquake = {},
+	SP_Earthquake2 = {},
+	SP_Finale = {},
+	SP_Jet = {},
+	SP_New_York = {},
+	SP_Paris = {},
+	SP_Sniper = {},
+	SP_Tank = {},
+	SP_Tank_b = {},
+	SP_Valley = {},
+	SP_Villa = {}
+}
+
 ---@param p_Partition DatabasePartition
 local function _TweakLevel(p_Partition)
 	local s_LevelData = LevelData(p_Partition.primaryInstance)
@@ -93,6 +114,20 @@ local function _TweakLevel(p_Partition)
 
 	s_LevelData.levelDescription.isCoop = false
 	s_LevelData.levelDescription.isMultiplayer = true
+
+	local s_Name = s_LevelData.name:gsub(".*/", "")
+
+	for _, l_Instance in ipairs(p_Partition.instances) do
+		if l_Instance.typeInfo.name == "SubWorldReferenceObjectData" then
+			l_Instance = SubWorldReferenceObjectData(l_Instance)
+			l_Instance:MakeWritable()
+
+			local s_AutoLoad = SubWorldBundleLoadingList[s_Name][l_Instance.bundleName:gsub(".*/", "")]
+			if s_AutoLoad ~= nil then
+				l_Instance.autoLoad = s_AutoLoad
+			end
+		end
+	end
 end
 
 ---@param p_HookCtx HookContext
